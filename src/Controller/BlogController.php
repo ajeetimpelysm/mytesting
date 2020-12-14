@@ -25,9 +25,26 @@ class BlogController extends AbstractController
     public function list(ValidatorInterface $validator)
     {
 
-        echo "Hellow";
+        $author = new Author();
 
-        die();
+        $author->name = 'Acme Inc.';
+        $author->description = '123 Main Street, Big City';
+        $author->experties = "It's my testing";
+
+        $serializer = $this->serialize();
+        $json = $serializer->serialize($author, 'json');
+        $companyCopy = $serializer->deserialize($json, Author::class, 'json');
+
+        $errors = $validator->validate($companyCopy);
+        $errorList = array();
+        if (count($errors) > 0) {
+            foreach($errors as $key => $value) {
+               $errorList[$errors[$key]->getPropertyPath()] = $errors[$key]->getMessage();
+            }
+            return new Response(json_encode($errorList));
+        }
+    
+        return new Response('The author is valid! Yes!');
         
     }
 
